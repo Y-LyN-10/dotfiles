@@ -8,7 +8,10 @@
  '(ansi-color-names-vector
    ["#2e3436" "#a40000" "#4e9a06" "#c4a000" "#204a87" "#5c3566" "#729fcf" "#eeeeec"])
  '(custom-enabled-themes (quote (tsdh-dark)))
- '(inhibit-startup-screen t))
+ '(display-time-mode t)
+ '(inhibit-startup-screen t)
+ '(initial-frame-alist (quote ((fullscreen . maximized))))
+ '(speedbar-frame-parameters (quote ((width . 40)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -21,97 +24,38 @@
 
 (setq debug-on-error t)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Marmelade package manager
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;; Emacs is not a package manager, and here we load its package manager!
-(require 'package)
-(dolist (source '(("marmalade" . "http://marmalade-repo.org/packages/")
-                  ("elpa" . "http://tromey.com/elpa/")
-                  ("melpa" . "http://melpa.milkbox.net/packages/")
-                  ))
-
-(add-to-list 'package-archives source t))
-(package-initialize)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Emacs theme customize
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Include current buffer name in the title bar
-(setq frame-title-format '(buffer-file-name "%f" ("%b")))
+;; Mark that there are unsaved changes in the current buffer name
+(setq frame-title-format
+    '((:eval (if (buffer-file-name)
+                  (abbreviate-file-name (buffer-file-name))
+                    "%b"))
+      (:eval (if (buffer-modified-p) 
+                 " •"))
+      " - Emacs")
+    )
 
-;; Enable visual feedback on selections
-(setq transient-mark-mode t)
+;; Directory tree
+(require 'sr-speedbar)
+(sr-speedbar-open)
+(global-set-key (kbd "s-s") 'sr-speedbar-toggle)
 
 ;; fringle-mode right only, add scroll bar
 (set-fringe-mode '(0 . nil))
 (set-scroll-bar-mode 'right)
 
-;; auto-scroll bar, based on text height
-(setq-default
- mode-line-position
- '(:eval
-   (let ((scroll-bars  (nth 2 (window-scroll-bars))))
-     (if (or (> (point-max) (window-end))  (< (point-min) (window-start)))
-         (unless scroll-bars (set-window-scroll-bars nil 20 t))
-       (when scroll-bars (set-window-scroll-bars nil 0 t)))
-     (unless (equal scroll-bars (nth 2 (window-scroll-bars))) (redraw-frame))
-     `((-3 ,(propertize
-             "%p"
-             'local-map mode-line-column-line-number-mode-map
-             'mouse-face 'mode-line-highlight
-             'help-echo "Buffer position, mouse-1: Line/col menu"))
-       (line-number-mode
-        ((column-number-mode
-          (10 ,(propertize
-                " (%l,%c)"
-                'face (and (> (current-column)
-                              modelinepos-column-limit)
-                           'modelinepos-column-warning)
-                'local-map mode-line-column-line-number-mode-map
-                'mouse-face 'mode-line-highlight
-                'help-echo "Line and column, mouse-1: Line/col menu"))
-          (6 ,(propertize
-               " L%l"
-               'local-map mode-line-column-line-number-mode-map
-               'mouse-face 'mode-line-highlight
-               'help-echo "Line number, mouse-1: Line/col menu"))))
-        ((column-number-mode
-          (5 ,(propertize
-               " C%c"
-               'face (and (> (current-column)
-                             modelinepos-column-limit)
-                          'modelinepos-column-warning)
-               'local-map mode-line-column-line-number-mode-map
-               'mouse-face 'mode-line-highlight
-               'help-echo "Column number, mouse-1: Line/col menu")))))))))
-
-;; surprise
-(defconst animate-n-steps 3) 
-  (defun emacs-reloaded ()
-    (animate-string (concat ";; Initialization successful, welcome to "
-  			  (substring (emacs-version) 0 16)
-			  ".")
-		  0 0)
-    (newline-and-indent)  (newline-and-indent))
-
-(add-hook 'after-init-hook 'emacs-reloaded)  
+;; TODO: auto-scroll bar, based on text height
 
 ;; select all
 (global-set-key "\C-c\C-a" 'mark-whole-buffer)
 
-;; Directory tree
-(require 'sr-speedbar)
-(global-set-key (kbd "s-s") 'sr-speedbar-toggle)
-
-;; Remove tool-bar
-;; (gbby-one-zbqr f)
-
 ;; Line numbers
 (global-linum-mode t)
 (column-number-mode t)
+;; TODO: remove linum mode at speedbar frame
 
 ;; Separating line numbers from text
 ;; (setq linum-format "%d ")
@@ -128,33 +72,41 @@
     (funcall (if insert 'insert 'message)
              (format-time-string "%a, %d %b %Y %T %Z" (current-time))))
 
-;; Smart inference in case of used tabs
-(defun how-many-region (begin end regexp &optional interactive)
-  "Print number of non-trivial matches for REGEXP in region.                    
-Non-interactive arguments are Begin End Regexp"
-  (interactive "r\nsHow many matches for (regexp): \np")
-  (let ((count 0) opoint)
-    (save-excursion
-      (setq end (or end (point-max)))
-      (goto-char (or begin (point)))
-      (while (and (< (setq opoint (point)) end)
-                  (re-search-forward regexp end t))
-        (if (= opoint (point))
-            (forward-char 1)
-          (setq count (1+ count))))
-      (if interactive (message "%d occurrences" count))
-      count)))
+;; Adjust size of window accoridng to screen resolution.
+(defun set-frame-size-according-to-resolution ()
+  (interactive)
+  (if window-system
+  (progn
+    ;; use 120 char wide window for largeish displays
+    ;; and smaller 80 column windows for smaller displays
+    ;; pick whatever numbers make sense for you
+    (if (> (x-display-pixel-width) 1280)
+           (add-to-list 'default-frame-alist (cons 'width 120))
+           (add-to-list 'default-frame-alist (cons 'width 85)))
+    ;; for the height, subtract a couple hundred pixels
+    ;; from the screen height (for panels, menubars and
+    ;; whatnot), then divide by the height of a char to
+    ;; get the height we want
+    (add-to-list 'default-frame-alist 
+         (cons 'height (/ (- (x-display-pixel-height) 200)
+                             (frame-char-height)))))))
 
-(defun infer-indentation-style ()
-  ;; if our source file uses tabs, we use tabs, if spaces spaces, and if        
-  ;; neither, we use the current indent-tabs-mode                               
-  (let ((space-count (how-many-region (point-min) (point-max) "^  "))
-        (tab-count (how-many-region (point-min) (point-max) "^\t")))
-    (if (> space-count tab-count) (setq indent-tabs-mode nil))
-    (if (> tab-count space-count) (setq indent-tabs-mode t))))
+(set-frame-size-according-to-resolution)
 
-(setq indent-tabs-mode nil)
-(infer-indentation-style)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Marmelade package manager
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Emacs is not a package manager, and here we load its package manager!
+(require 'package)
+(dolist (source '(("marmalade" . "http://marmalade-repo.org/packages/")
+                  ("elpa" . "http://tromey.com/elpa/")
+                  ("melpa" . "http://melpa.milkbox.net/packages/")
+                  ))
+
+(add-to-list 'package-archives source t))
+(package-initialize)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages & Other preferences
@@ -172,7 +124,7 @@ Non-interactive arguments are Begin End Regexp"
 (add-hook 'Man-mode-hook 'goto-address)
 
 ;; js2 extras mode
-(js2-imenu-extras-mode)
+;; (js2-imenu-extras-mode)
 
 ;; js2-mode and jslint
 
@@ -206,7 +158,7 @@ Non-interactive arguments are Begin End Regexp"
 (add-to-list 'auto-mode-alist '("\\.styl\\'" . sws-mode))
 
 ;; smart-tabs
-(smart-tabs-advice js2-indent-line js2-basic-offset)
+;; (smart-tabs-advice js2-indent-line js2-basic-offset)
 
 ;; tern
 (add-hook 'js-mode-hook (lambda () (tern-mode t)))
@@ -234,3 +186,5 @@ Non-interactive arguments are Begin End Regexp"
 (define-key yafolding-mode-map (kbd "C-c <C-S-return>") 'yafolding-hide-parent-element)
 (define-key yafolding-mode-map (kbd "C-c <C-return>") 'yafolding-toggle-element)
 
+;; Enable shift selection mode (shame on me)
+(setq shift-select-mode t)
