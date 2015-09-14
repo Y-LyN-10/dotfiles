@@ -188,3 +188,14 @@
 
 ;; Enable shift selection mode (shame on me)
 (setq shift-select-mode t)
+
+;; Let's play with GO Lang a little bit :))
+(require 'go-complete)
+(add-hook 'completion-at-point-functions 'go-complete-at-point)
+(require 'go-autocomplete)
+
+(require 'auto-complete-config)
+(define-key ac-mode-map (kbd "M-TAB") 'auto-complete)
+
+(add-to-list 'load-path "PATH CONTAINING golint.el" t)
+(require 'golint)
