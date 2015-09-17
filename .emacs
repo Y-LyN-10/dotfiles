@@ -206,3 +206,63 @@
 
 (add-to-list 'load-path "PATH CONTAINING golint.el" t)
 (require 'golint)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; enable slime as common lisp REPL 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq inferior-lisp-program "sbcl")
+(add-to-list 'load-path "~/.emacs.d/elpa/slime.el")
+;; install slime-autodoc
+
+(require 'slime)
+(slime-setup '(slime-fancy))
+(slime-setup '(slime-autodoc))
+
+(show-paren-mode 1)
+(setq show-paren-delay 4)
+(setq-default indent-tabs-mode nil)
+
+(setq auto-mode-alist
+      (append '(("\\.cl$" . lisp-mode)
+		("\\.lsp$" . lisp-mode)
+		("\\.sbclrc$" . lisp-mode)
+		("\\.system$" . lisp-mode))
+	      auto-mode-alist))
+
+(eval-after-load "slime"
+  '(progn
+     (require 'info-look) ;search documentation with C-h S
+     (info-lookup-add-help
+      :mode 'lisp-mode
+      :regexp "[^][()'\" \t\n]+"
+      :ignore-case t
+      :doc-spec '(("(ansicl)Symbol Index" nil nil nil)))
+     (global-set-key "\C-cs" 'slime-selector)
+     (add-hook 'slime-mode-hook
+	       (lambda ()
+		 (set-variable lisp-indent-function 'common-lisp-indent-function)
+		 (define-key slime-mode-map "\r" 'newline-and-indent)
+		 (define-key slime-mode-map "\t" 'slime-indent-and-complete-symbol)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; enable pep8
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (load "flymake" t)
+ (defun flymake-pylint-init ()
+   (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                      'flymake-create-temp-inplace))
+          (local-file (file-relative-name
+                       temp-file
+                       (file-name-directory buffer-file-name))))
+         (list "pep8" (list "--repeat" local-file))))
+
+ (add-to-list 'flymake-allowed-file-name-masks
+              '("\\.py\\'" flymake-pylint-init)))
+
+(defun my-flymake-show-help ()
+  (when (get-char-property (point) 'flymake-overlay)
+    (let ((help (get-char-property (point) 'help-echo)))
+      (if help (message "%s" help)))))
+
+(add-hook 'post-command-hook 'my-flymake-show-help)
