@@ -47,6 +47,7 @@ alias py='python'
 alias ..='cd ../'
 alias osv='uname -r'
 alias fixit='sudo rm -f /var/lib/pacman/db.lck && sudo pacman-mirrors -g && sudo pacman -Syyuu  && sudo pacman -Suu'
+alias unode='nvm install node --reinstall-packages-from=node && nvm alias default stable'
 
 # Bye
 alias sb='systemctl suspend'
