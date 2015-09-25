@@ -174,6 +174,11 @@
           '(lambda ()
              (term-set-escape-char ?\C-x)))
 
+;; auto-enable cool modes
+(auto-complete-mode t)
+(company-mode t)
+(electric-pair-mode t)
+
 ;; jade-mode
 (add-to-list 'load-path "~/elisp/jade-mode")
 (require 'sws-mode)
