@@ -158,6 +158,22 @@
 (global-set-key (kbd "C-:") 'ac-complete-with-helm)
 (define-key ac-complete-mode-map (kbd "C-:") 'ac-complete-with-helm)
 
+;; JavaScript auto-complete with tern
+(add-to-list 'load-path "/home/yten/bin/tern/emacs/")
+(autoload 'tern-mode "tern.el" nil t)
+(add-hook 'js-mode-hook (lambda () (tern-mode t)))
+
+(autoload 'tern-mode "tern-auto-complete.el" nil t)
+(eval-after-load 'tern
+   '(progn
+      (require 'tern-auto-complete)
+      (tern-ac-setup)))
+
+;; Use emacs keybindings in term-mode
+(add-hook 'term-mode-hook
+          '(lambda ()
+             (term-set-escape-char ?\C-x)))
+
 ;; jade-mode
 (add-to-list 'load-path "~/elisp/jade-mode")
 (require 'sws-mode)
@@ -166,15 +182,6 @@
 
 ;; smart-tabs
 ;; (smart-tabs-advice js2-indent-line js2-basic-offset)
-
-;; tern
-(add-hook 'js-mode-hook (lambda () (tern-mode t)))
-(eval-after-load 'tern
-   '(progn
-      (require 'tern-auto-complete)
-      (tern-ac-setup)))
-
-(autoload 'tern-mode "tern.el" nil t)
 
 ;; folding
 (require 'yafolding)
