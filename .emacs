@@ -203,16 +203,27 @@
 ;; Enable shift selection mode (shame on me)
 (setq shift-select-mode t)
 
-;; Let's play with GO Lang a little bit :))
+;; Let's play with GO!
+(setenv "GOPATH" "~/go")
+
+(add-to-list 'load-path "~/elisp/go-mode.el")
+(add-to-list 'load-path "~/elisp/generated-autoload-file")
+(add-to-list 'exec-path "~/go/bin")
+
+(require 'go-mode-load)
+
 (require 'go-complete)
 (add-hook 'completion-at-point-functions 'go-complete-at-point)
 (require 'go-autocomplete)
 
 (require 'auto-complete-config)
-(define-key ac-mode-map (kbd "M-TAB") 'auto-complete)
+(define-key ac-mode-map (kbd "C-TAB") 'auto-complete)
 
 (add-to-list 'load-path "PATH CONTAINING golint.el" t)
 (require 'golint)
+
+; Call Gofmt before saving                                                    
+(add-hook 'before-save-hook 'gofmt-before-save)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; enable slime as common lisp REPL 
