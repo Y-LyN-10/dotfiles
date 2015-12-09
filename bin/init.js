@@ -1,7 +1,5 @@
 var shell = require('./shellHelper');
 
-var exec = require('child_process').exec;
-
 // The browsers are configured to open multiple tabs as home-pages
 var programs = [
   'chromium',          // open google mail & source control systems
