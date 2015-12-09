@@ -36,6 +36,7 @@ alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
+
 # export QT_SELECT=4
 alias c='clear'
 alias cls='clear'
@@ -68,15 +69,27 @@ alias esh='emacs ~/.bashrc'
 
 # Fire up DBs
 alias runmongorun='sudo systemctl start mongodb'
+alias renginx='sudo systemctl restart nginx.service' 
+
+# Hyper lazy automation                                                                                           
+alias r='source ~/.bashrc'
+alias fire='node ~/bin/init.js &' # exec bunch of programs at once
+alias tmuxd='~/bin/init.sh'       # open tmux with multiple windows
 
 # Projects
-alias fchart='cd Projects/mentormate-orgchart && runmongorun && git status'
-alias chart='cd Projects/mentormate-orgchart && git status'
+# ...
+# list of projects to navigate into && show their git status
+# ...
+
+# Remote
+alias sshstr='sudo systemctl start sshd.service'
+alias sshstp='sudo systemctl stop sshd.service'
+# ...
+# list of servers to connect to via ssh
+# ...
 
 # Development
-alias harmony='iojs --es-staging --harmony --harmony_shipping --harmony_modules --harmony_arrays --harmony_array_includes --harmony_regexps --harmony_arrow_functions --harmony_proxies --harmony_sloppy --harmony_unicode --harmony_tostring --harmony_classes --harmony_object_literals'
-alias nh='node --harmony'
-alias fire='npm start'
+alias start='npm start'
 alias gruc='grunt compile'
 alias gruh='grunt jade' # ~ grunt html
 
@@ -89,7 +102,7 @@ alias pullm='git pull origin master'
 alias pushm='git push origin master'
 alias rmorig=' find . -type f -name "*.orig" -exec rm -f {} \;' # remove post-merge conflict files
 
-# Enable history appending instead of overwriting.  #139609
+# Enable history appending instead of overwriting
 shopt -s histappend
 
 # Change the window title of X terminals
