@@ -9,6 +9,15 @@ fi
 
 xhost +local:root > /dev/null 2>&1
 
+if ! pgrep ssh-agent > /dev/null; then
+    ssh-agent > ~/.ssh-agent-thing
+fi
+if [[ "$SSH_AGENT_PID" == "" ]]; then
+    eval $(<~/.ssh-agent-thing)
+fi
+
+ssh-add -l >/dev/null || alias ssh='ssh-add -l >/dev/null || ssh-add && unalias ssh; ssh'
+
 source /usr/share/git/completion/git-completion.bash
 complete -cf sudo
 
@@ -28,6 +37,7 @@ alias ls='ls --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=au
 alias ll='ls -l --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=auto -F'
 alias la='ls -la --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=auto -F'
 alias l.='ls -d .* --color=auto'
+alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 
 # Day-to-day
 alias grep='grep --color=tty -d skip'
@@ -36,7 +46,6 @@ alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
-
 # export QT_SELECT=4
 alias c='clear'
 alias cls='clear'
@@ -46,9 +55,13 @@ alias h='history'
 alias fake='fallocate -l'
 alias py='python'
 alias ..='cd ../'
+alias ...='cd ../../'
+alias ws='curl -4 http://wttr.in/Sofia'
 alias osv='uname -r'
 alias fixit='sudo rm -f /var/lib/pacman/db.lck && sudo pacman-mirrors -g && sudo pacman -Syyuu  && sudo pacman -Suu'
 alias unode='nvm install node --reinstall-packages-from=node && nvm alias default stable'
+alias dy='youtube-dl [OPTIONS] URL [URL...]'
+# Download playlist from youtube in mp3 example: dy -i -x -o '~/Music/%(playlist)s/%(title)s.%(ext)s' {PLAYLIST URL} --audio-format mp3 
 
 # Bye
 alias sb='systemctl suspend'
@@ -60,49 +73,50 @@ alias goodnight='sudo bash -c "sleep 1h; systemctl suspend"'
 alias please='sudo'
 alias sudp='sudo'
 alias _='sudo'
+alias s='sudo'
 
 # Editors
-alias vi=vim
-alias svi='sudo vi'
-alias edit='emacs'
-alias esh='emacs ~/.bashrc'
+alias vi='emacs -nw'
+alias vim='sudo emacs -nw'
+alias edit='sudo emacs -nw'
+alias besh='sudo emacs -nw ~/.bashrc'
 
-# Fire up DBs
+# Fire up DBs & Services
 alias runmongorun='sudo systemctl start mongodb'
-alias renginx='sudo systemctl restart nginx.service' 
+alias renginx='sudo systemctl restart nginx.service'
+alias kiln='sudo /usr/sbin/nginx -s stop'
 
-# Hyper lazy automation                                                                                           
+# Automation
 alias r='source ~/.bashrc'
-alias fire='node ~/bin/init.js &' # exec bunch of programs at once
-alias tmuxd='~/bin/init.sh'       # open tmux with multiple windows
+alias fire='node ~/bin/init.js &' # launch browsers, skype and mail reader
+alias tmuxd='~/bin/init.sh'
+# alias hfhpass='token=$(tail -n2 <./storage/logs/laravel.log | grep -o ".\{0,0\}reset/.\{0,64\}" | cut -c7- | tail -n1) && chromium http://localhost:8000/#/set-password/$token'
 
 # Projects
-# ...
-# list of projects to navigate into && show their git status
-# ...
+# private block
 
 # Remote
-alias sshstr='sudo systemctl start sshd.service'
-alias sshstp='sudo systemctl stop sshd.service'
-# ...
-# list of servers to connect to via ssh
-# ...
+# private block
 
 # Development
 alias start='npm start'
 alias gruc='grunt compile'
 alias gruh='grunt jade' # ~ grunt html
+alias server='node ~/http-server/bin/http-server'
+#alias composer='/usr/local/bin/composer.phar'
 
 # Git aliases
 alias gs='git status'
+alias gb='git branch'
 alias gl='git log --all --graph'
 alias gch='git checkout'
 alias gcm='git commit -m'
+alias gp='git pull'
 alias pullm='git pull origin master'
 alias pushm='git push origin master'
 alias rmorig=' find . -type f -name "*.orig" -exec rm -f {} \;' # remove post-merge conflict files
 
-# Enable history appending instead of overwriting
+# Enable history appending instead of overwriting.  #139609
 shopt -s histappend
 
 # Change the window title of X terminals
