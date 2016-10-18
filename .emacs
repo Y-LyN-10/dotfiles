@@ -197,6 +197,9 @@
             ;; Activate the folding mode
             (hs-minor-mode t)))
 
+;; key-bindings for folding JS code (same as in web-mode for HTML)
+(global-set-key (kbd "\C-c \C-f") 'hs-toggle-hiding)
+
 ;; auto-enable cool modes
 (require 'auto-complete)
 (global-auto-complete-mode t)
@@ -221,6 +224,12 @@
 (require 'sws-mode)
 (require 'jade-mode)
 (add-to-list 'auto-mode-alist '("\\.styl\\'" . sws-mode))
+
+;; Spotify keybindings
+(global-set-key (kbd "\C-N") 'spotify-next)
+(global-set-key (kbd "\C-R") 'spotify-prev)
+(global-set-key (kbd "\C-c") 'spotify-current)
+(global-set-key (kbd "\C-P") 'spotify-playpause) ;; toggle play/pause
 
 ;; smart-tabs
 ;; (smart-tabs-advice js2-indent-line js2-basic-offset)
