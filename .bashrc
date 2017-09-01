@@ -37,9 +37,13 @@ alias ls='ls --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=au
 alias ll='ls -l --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=auto -F'
 alias la='ls -la --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=auto -F'
 alias l.='ls -d .* --color=auto'
+
+alias whatdo='leasot --tags FIXME ./**/*.js ./**/**/*.js --ignore "./node_modules/**/*.js"'
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
+alias myip='curl ifconfig.co'
 
 # Day-to-day
+alias open='xdg-open .'                   # open current folder in GUI
 alias grep='grep --color=tty -d skip'
 alias cp="cp -i"                          # confirm before overwriting something
 alias df='df -h'                          # human-readable sizes
@@ -60,6 +64,7 @@ alias ws='curl -4 http://wttr.in/Sofia'
 alias osv='uname -r'
 alias fixit='sudo rm -f /var/lib/pacman/db.lck && sudo pacman-mirrors -g && sudo pacman -Syyuu  && sudo pacman -Suu'
 alias unode='nvm install node --reinstall-packages-from=node && nvm alias default stable'
+alias tarzan='tar -czf "../${PWD##*/}.tar.gz" .' # zip current directory
 alias dy='youtube-dl [OPTIONS] URL [URL...]'
 # Download playlist from youtube in mp3 example: dy -i -x -o '~/Music/%(playlist)s/%(title)s.%(ext)s' {PLAYLIST URL} --audio-format mp3 
 
@@ -85,6 +90,9 @@ alias besh='sudo emacs -nw ~/.bashrc'
 alias runmongorun='sudo systemctl start mongodb'
 alias renginx='sudo systemctl restart nginx.service'
 alias kiln='sudo /usr/sbin/nginx -s stop'
+alias rmq='sudo rabbitmq-server'
+alias neos='sudo systemctl start neo4j.service'
+alias neobin='sudo /bin/neo4j start'
 
 # Automation
 alias r='source ~/.bashrc'
@@ -100,8 +108,6 @@ alias tmuxd='~/bin/init.sh'
 
 # Development
 alias start='npm start'
-alias gruc='grunt compile'
-alias gruh='grunt jade' # ~ grunt html
 alias server='node ~/http-server/bin/http-server'
 #alias composer='/usr/local/bin/composer.phar'
 
